@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RndDotNet.InstructionPipelining.Benchmark", "src\RndDotNet.InstructionPipelining.Benchmark\RndDotNet.InstructionPipelining.Benchmark.csproj", "{8C1548DD-9121-4033-B28C-48979F304FDC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8C1548DD-9121-4033-B28C-48979F304FDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C1548DD-9121-4033-B28C-48979F304FDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C1548DD-9121-4033-B28C-48979F304FDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C1548DD-9121-4033-B28C-48979F304FDC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
