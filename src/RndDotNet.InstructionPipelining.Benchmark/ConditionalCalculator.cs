@@ -1,11 +1,15 @@
 ﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Jobs;
 
 namespace RndDotNet.InstructionPipelining.Benchmark;
 
-[SimpleJob(launchCount: 1, warmupCount: 10, targetCount: 100)]
+[ShortRunJob(RuntimeMoniker.Net60, Jit.RyuJit, Platform.X64)]
+[LongRunJob(RuntimeMoniker.Net60, Jit.RyuJit, Platform.X64)]
 public class ConditionalCalculator
 {
-	private const int billsCount = 100_000_000;
+	private const int billsCount = 10_000;
+	private const int maxCost = 1000;
 	private int[] bills;
 	private int[] orderedBills;
 	private int[] patternOrderedBills;
@@ -14,9 +18,10 @@ public class ConditionalCalculator
 	public void GlobalSetup()
 	{
 		var rnd = new Random(61);
-		bills = Enumerable.Range(0, billsCount).Select(i => rnd.Next(0, 100000)).ToArray();
+		patternOrderedBills = Enumerable.Range(0, billsCount).Select(i => rnd.Next(0, maxCost, i % 2 == 0)).ToArray();
+		bills = patternOrderedBills.OrderBy(x => Guid.NewGuid()).ToArray();
 		orderedBills = bills.OrderBy(s => s % 2 == 0).ToArray();
-		patternOrderedBills = Enumerable.Range(0, billsCount).Select(i => rnd.Next(0, 100000, i % 2 == 0)).ToArray();
+		
 	}
 	
 	[Benchmark(Baseline = true)]

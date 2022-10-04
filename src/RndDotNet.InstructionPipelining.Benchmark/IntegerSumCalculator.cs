@@ -1,23 +1,27 @@
 ﻿using System.Numerics;
 using System.Runtime.InteropServices;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Jobs;
 
 namespace RndDotNet.InstructionPipelining.Benchmark;
 
-[SimpleJob(launchCount: 1, warmupCount: 10, targetCount: 100)]
-public class IntegerCalculator
+[ShortRunJob(RuntimeMoniker.Net60, Jit.RyuJit, Platform.X64)]
+[LongRunJob(RuntimeMoniker.Net60, Jit.RyuJit, Platform.X64)]
+public class IntegerSumCalculator
 {
-	private const int billsCount = 100_000_008;
-	private long[] bills;
+	private const int billsCount = 10_000;
+	private const int maxCost = 1000;
+	private int[] bills;
 
 	[GlobalSetup]
 	public void GlobalSetup()
 	{
 		var rnd = new Random(61);
-		bills = Enumerable.Range(0, billsCount).Select(i => rnd.NextInt64(0, 100000)).ToArray();
+		bills = Enumerable.Range(0, billsCount).Select(i => rnd.Next(0, maxCost)).ToArray();
 	}
 	
-	[Benchmark(Baseline = true)]
+	[Benchmark]
 	public long EnumerableSum()
 	{
 		return bills.Sum();
@@ -41,7 +45,7 @@ public class IntegerCalculator
 	{
 		long result = 0;
 		var length = bills.Length;
-		fixed (long* ptr = bills)
+		fixed (int* ptr = bills)
 		{
 			var pointer = ptr;
 			var bound = pointer + length;
@@ -61,7 +65,7 @@ public class IntegerCalculator
 		long x = 0;
  
 		var length = bills.Length;
-		fixed (long* ptr = bills)
+		fixed (int* ptr = bills)
 		{
 			var pointer = ptr;
 			var bound = pointer + length;
@@ -78,7 +82,7 @@ public class IntegerCalculator
 		return x;
 	}
 	
-	[Benchmark]
+	[Benchmark(Baseline = true)]
 	public unsafe long SumTrickyAndSmartUnsafe()
 	{
 		long w = 0;
@@ -87,7 +91,7 @@ public class IntegerCalculator
 		long z = 0;
  
 		var length = bills.Length;
-		fixed (long* ptr = bills)
+		fixed (int* ptr = bills)
 		{
 			var pointer = ptr;
 			var bound = pointer + length;
@@ -113,7 +117,7 @@ public class IntegerCalculator
 		long x = 0;
 
 		var length = bills.Length;
-		fixed (long* ptr = bills)
+		fixed (int* ptr = bills)
 		{
 			var pointer = ptr;
 			var bound = pointer + length;
@@ -121,40 +125,13 @@ public class IntegerCalculator
 			{
 				w += *pointer;
 				x += *(pointer + 1);
-				w += *(pointer + 2);
-				x += *(pointer + 3);
-				pointer += 4;
+				pointer += 2;
 			}
 		}
 
 		return w + x;
 	}
-	
-	[Benchmark]
-	public unsafe long SumTrickyAndSmartUnsafe3()
-	{
-		long w = 0;
-		long x = 0;
-		long y = 0;
 
-		var length = bills.Length;
-		fixed (long* ptr = bills)
-		{
-			var pointer = ptr;
-			var bound = pointer + length;
-			while (pointer != bound)
-			{
-				w += *pointer;
-				x += *(pointer + 1);
-				y += *(pointer + 2);
-				pointer += 3;
-			}
-		}
-
-		w += y;
-		return w + x;
-	}
-	
 	[Benchmark]
 	public unsafe long SumTrickyAndSmartUnsafe8()
 	{
@@ -168,7 +145,7 @@ public class IntegerCalculator
 		long z2 = 0;
  
 		var length = bills.Length;
-		fixed (long* ptr = bills)
+		fixed (int* ptr = bills)
 		{
 			var pointer = ptr;
 			var bound = pointer + length;
@@ -194,37 +171,15 @@ public class IntegerCalculator
 		w2 += y2;
 		return w + w2;
 	}
-	
+
 	[Benchmark]
-	public unsafe long SumTrickyAndSmartUnsafe2Shift2()
+	public unsafe long SumTrickyAndSmartUnsafe2Shift16()
 	{
 		long w = 0;
 		long x = 0;
 
 		var length = bills.Length;
-		fixed (long* ptr = bills)
-		{
-			var pointer = ptr;
-			var bound = pointer + length;
-			while (pointer != bound)
-			{
-				w += *pointer;
-				x += *(pointer + 1);
-				pointer += 2;
-			}
-		}
-
-		return w + x;
-	}
-	
-	[Benchmark]
-	public unsafe long SumTrickyAndSmartUnsafe2Shift8()
-	{
-		long w = 0;
-		long x = 0;
-
-		var length = bills.Length;
-		fixed (long* ptr = bills)
+		fixed (int* ptr = bills)
 		{
 			var pointer = ptr;
 			var bound = pointer + length;
@@ -238,7 +193,15 @@ public class IntegerCalculator
 				x += *(pointer + 5);
 				w += *(pointer + 6);
 				x += *(pointer + 7);
-				pointer += 8;
+				w += *(pointer + 8);
+				x += *(pointer + 9);
+				w += *(pointer + 10);
+				x += *(pointer + 11);
+				w += *(pointer + 12);
+				x += *(pointer + 13);
+				w += *(pointer + 14);
+				x += *(pointer + 15);
+				pointer += 16;
 			}
 		}
 
@@ -248,15 +211,15 @@ public class IntegerCalculator
 	[Benchmark]
 	public long SumSimd()
 	{
-		Vector<long> vectorSum = Vector<long>.Zero;
+		Vector<int> vectorSum = Vector<int>.Zero;
  
-		Span<Vector<long>> vectorsArray = MemoryMarshal.Cast<long, Vector<long>>(bills);
+		Span<Vector<int>> vectorsArray = MemoryMarshal.Cast<int, Vector<int>>(bills);
  
 		for (var i = 0; i < vectorsArray.Length; i++)
 		{
 			vectorSum += vectorsArray[i];
 		}
  
-		return Vector.Dot(vectorSum, Vector<long>.One);
+		return Vector.Dot(vectorSum, Vector<int>.One);
 	}
 }
