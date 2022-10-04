@@ -1,15 +1,16 @@
 ﻿using System.Numerics;
 using System.Runtime.InteropServices;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 
 namespace RndDotNet.InstructionPipelining.Benchmark;
 
-[SimpleJob(RunStrategy.Throughput, RuntimeMoniker.Net60, 3, 10, 100)]
-public class IntegerCalculator
+[ShortRunJob(RuntimeMoniker.Net60, Jit.RyuJit, Platform.X64)]
+[LongRunJob(RuntimeMoniker.Net60, Jit.RyuJit, Platform.X64)]
+public class IntegerSumCalculator
 {
-	private const int billsCount = 10_008;
+	private const int billsCount = 10_000;
 	private const int maxCost = 1000;
 	private int[] bills;
 
@@ -20,7 +21,7 @@ public class IntegerCalculator
 		bills = Enumerable.Range(0, billsCount).Select(i => rnd.Next(0, maxCost)).ToArray();
 	}
 	
-	[Benchmark(Baseline = true)]
+	[Benchmark]
 	public long EnumerableSum()
 	{
 		return bills.Sum();
@@ -81,7 +82,7 @@ public class IntegerCalculator
 		return x;
 	}
 	
-	[Benchmark]
+	[Benchmark(Baseline = true)]
 	public unsafe long SumTrickyAndSmartUnsafe()
 	{
 		long w = 0;
@@ -124,40 +125,13 @@ public class IntegerCalculator
 			{
 				w += *pointer;
 				x += *(pointer + 1);
-				w += *(pointer + 2);
-				x += *(pointer + 3);
-				pointer += 4;
+				pointer += 2;
 			}
 		}
 
 		return w + x;
 	}
-	
-	[Benchmark]
-	public unsafe long SumTrickyAndSmartUnsafe3()
-	{
-		long w = 0;
-		long x = 0;
-		long y = 0;
 
-		var length = bills.Length;
-		fixed (int* ptr = bills)
-		{
-			var pointer = ptr;
-			var bound = pointer + length;
-			while (pointer != bound)
-			{
-				w += *pointer;
-				x += *(pointer + 1);
-				y += *(pointer + 2);
-				pointer += 3;
-			}
-		}
-
-		w += y;
-		return w + x;
-	}
-	
 	[Benchmark]
 	public unsafe long SumTrickyAndSmartUnsafe8()
 	{
@@ -197,31 +171,9 @@ public class IntegerCalculator
 		w2 += y2;
 		return w + w2;
 	}
-	
-	[Benchmark]
-	public unsafe long SumTrickyAndSmartUnsafe2Shift2()
-	{
-		long w = 0;
-		long x = 0;
 
-		var length = bills.Length;
-		fixed (int* ptr = bills)
-		{
-			var pointer = ptr;
-			var bound = pointer + length;
-			while (pointer != bound)
-			{
-				w += *pointer;
-				x += *(pointer + 1);
-				pointer += 2;
-			}
-		}
-
-		return w + x;
-	}
-	
 	[Benchmark]
-	public unsafe long SumTrickyAndSmartUnsafe2Shift8()
+	public unsafe long SumTrickyAndSmartUnsafe2Shift16()
 	{
 		long w = 0;
 		long x = 0;
@@ -241,7 +193,15 @@ public class IntegerCalculator
 				x += *(pointer + 5);
 				w += *(pointer + 6);
 				x += *(pointer + 7);
-				pointer += 8;
+				w += *(pointer + 8);
+				x += *(pointer + 9);
+				w += *(pointer + 10);
+				x += *(pointer + 11);
+				w += *(pointer + 12);
+				x += *(pointer + 13);
+				w += *(pointer + 14);
+				x += *(pointer + 15);
+				pointer += 16;
 			}
 		}
 
