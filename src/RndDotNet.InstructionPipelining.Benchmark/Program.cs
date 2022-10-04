@@ -2,4 +2,4 @@
 using RndDotNet.InstructionPipelining.Benchmark;
 
 BenchmarkRunner.Run<IntegerCalculator>();
-BenchmarkRunner.Run<ConditionalCalculator>();
+//BenchmarkRunner.Run<ConditionalCalculator>();

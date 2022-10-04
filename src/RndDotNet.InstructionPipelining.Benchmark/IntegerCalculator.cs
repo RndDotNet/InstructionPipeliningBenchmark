@@ -1,20 +1,23 @@
 ﻿using System.Numerics;
 using System.Runtime.InteropServices;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Jobs;
 
 namespace RndDotNet.InstructionPipelining.Benchmark;
 
-[SimpleJob(launchCount: 1, warmupCount: 10, targetCount: 100)]
+[SimpleJob(RunStrategy.Throughput, RuntimeMoniker.Net60, 3, 10, 100)]
 public class IntegerCalculator
 {
-	private const int billsCount = 100_000_008;
-	private long[] bills;
+	private const int billsCount = 10_008;
+	private const int maxCost = 1000;
+	private int[] bills;
 
 	[GlobalSetup]
 	public void GlobalSetup()
 	{
 		var rnd = new Random(61);
-		bills = Enumerable.Range(0, billsCount).Select(i => rnd.NextInt64(0, 100000)).ToArray();
+		bills = Enumerable.Range(0, billsCount).Select(i => rnd.Next(0, maxCost)).ToArray();
 	}
 	
 	[Benchmark(Baseline = true)]
@@ -41,7 +44,7 @@ public class IntegerCalculator
 	{
 		long result = 0;
 		var length = bills.Length;
-		fixed (long* ptr = bills)
+		fixed (int* ptr = bills)
 		{
 			var pointer = ptr;
 			var bound = pointer + length;
@@ -61,7 +64,7 @@ public class IntegerCalculator
 		long x = 0;
  
 		var length = bills.Length;
-		fixed (long* ptr = bills)
+		fixed (int* ptr = bills)
 		{
 			var pointer = ptr;
 			var bound = pointer + length;
@@ -87,7 +90,7 @@ public class IntegerCalculator
 		long z = 0;
  
 		var length = bills.Length;
-		fixed (long* ptr = bills)
+		fixed (int* ptr = bills)
 		{
 			var pointer = ptr;
 			var bound = pointer + length;
@@ -113,7 +116,7 @@ public class IntegerCalculator
 		long x = 0;
 
 		var length = bills.Length;
-		fixed (long* ptr = bills)
+		fixed (int* ptr = bills)
 		{
 			var pointer = ptr;
 			var bound = pointer + length;
@@ -138,7 +141,7 @@ public class IntegerCalculator
 		long y = 0;
 
 		var length = bills.Length;
-		fixed (long* ptr = bills)
+		fixed (int* ptr = bills)
 		{
 			var pointer = ptr;
 			var bound = pointer + length;
@@ -168,7 +171,7 @@ public class IntegerCalculator
 		long z2 = 0;
  
 		var length = bills.Length;
-		fixed (long* ptr = bills)
+		fixed (int* ptr = bills)
 		{
 			var pointer = ptr;
 			var bound = pointer + length;
@@ -202,7 +205,7 @@ public class IntegerCalculator
 		long x = 0;
 
 		var length = bills.Length;
-		fixed (long* ptr = bills)
+		fixed (int* ptr = bills)
 		{
 			var pointer = ptr;
 			var bound = pointer + length;
@@ -224,7 +227,7 @@ public class IntegerCalculator
 		long x = 0;
 
 		var length = bills.Length;
-		fixed (long* ptr = bills)
+		fixed (int* ptr = bills)
 		{
 			var pointer = ptr;
 			var bound = pointer + length;
@@ -248,15 +251,15 @@ public class IntegerCalculator
 	[Benchmark]
 	public long SumSimd()
 	{
-		Vector<long> vectorSum = Vector<long>.Zero;
+		Vector<int> vectorSum = Vector<int>.Zero;
  
-		Span<Vector<long>> vectorsArray = MemoryMarshal.Cast<long, Vector<long>>(bills);
+		Span<Vector<int>> vectorsArray = MemoryMarshal.Cast<int, Vector<int>>(bills);
  
 		for (var i = 0; i < vectorsArray.Length; i++)
 		{
 			vectorSum += vectorsArray[i];
 		}
  
-		return Vector.Dot(vectorSum, Vector<long>.One);
+		return Vector.Dot(vectorSum, Vector<int>.One);
 	}
 }

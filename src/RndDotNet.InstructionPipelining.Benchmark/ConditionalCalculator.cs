@@ -1,8 +1,10 @@
 ﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Jobs;
 
 namespace RndDotNet.InstructionPipelining.Benchmark;
 
-[SimpleJob(launchCount: 1, warmupCount: 10, targetCount: 100)]
+[SimpleJob(RunStrategy.Throughput, RuntimeMoniker.Net60, 3, 10, 100, 10)]
 public class ConditionalCalculator
 {
 	private const int billsCount = 100_000_000;
