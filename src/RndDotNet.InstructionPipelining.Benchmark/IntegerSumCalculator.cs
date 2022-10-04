@@ -22,15 +22,15 @@ public class IntegerSumCalculator
 	}
 	
 	[Benchmark]
-	public long EnumerableSum()
+	public int EnumerableSum()
 	{
 		return bills.Sum();
 	}
 	
 	[Benchmark]
-	public long SumNaive()
+	public int SumNaive()
 	{
-		long result = 0;
+		int result = 0;
 		var bound = bills.Length;
 		for (int i = 0; i < bound; i++)
 		{
@@ -41,9 +41,9 @@ public class IntegerSumCalculator
 	}
 	
 	[Benchmark]
-	public unsafe long SumNaiveUnsafe()
+	public unsafe int SumNaiveUnsafe()
 	{
-		long result = 0;
+		int result = 0;
 		var length = bills.Length;
 		fixed (int* ptr = bills)
 		{
@@ -60,9 +60,9 @@ public class IntegerSumCalculator
 	}
 	
 	[Benchmark]
-	public unsafe long SumTrickyUnsafe()
+	public unsafe int SumTrickyUnsafe()
 	{
-		long x = 0;
+		int x = 0;
  
 		var length = bills.Length;
 		fixed (int* ptr = bills)
@@ -83,12 +83,12 @@ public class IntegerSumCalculator
 	}
 	
 	[Benchmark(Baseline = true)]
-	public unsafe long SumTrickyAndSmartUnsafe()
+	public unsafe int SumTrickyAndSmartUnsafe()
 	{
-		long w = 0;
-		long x = 0;
-		long y = 0;
-		long z = 0;
+		int w = 0;
+		int x = 0;
+		int y = 0;
+		int z = 0;
  
 		var length = bills.Length;
 		fixed (int* ptr = bills)
@@ -111,10 +111,10 @@ public class IntegerSumCalculator
 	}
 	
 	[Benchmark]
-	public unsafe long SumTrickyAndSmartUnsafe2()
+	public unsafe int SumTrickyAndSmartUnsafe2()
 	{
-		long w = 0;
-		long x = 0;
+		int w = 0;
+		int x = 0;
 
 		var length = bills.Length;
 		fixed (int* ptr = bills)
@@ -133,16 +133,16 @@ public class IntegerSumCalculator
 	}
 
 	[Benchmark]
-	public unsafe long SumTrickyAndSmartUnsafe8()
+	public unsafe int SumTrickyAndSmartUnsafe8()
 	{
-		long w = 0;
-		long x = 0;
-		long y = 0;
-		long z = 0;
-		long w2 = 0;
-		long x2 = 0;
-		long y2 = 0;
-		long z2 = 0;
+		int w = 0;
+		int x = 0;
+		int y = 0;
+		int z = 0;
+		int w2 = 0;
+		int x2 = 0;
+		int y2 = 0;
+		int z2 = 0;
  
 		var length = bills.Length;
 		fixed (int* ptr = bills)
@@ -173,10 +173,10 @@ public class IntegerSumCalculator
 	}
 
 	[Benchmark]
-	public unsafe long SumTrickyAndSmartUnsafe2Shift16()
+	public unsafe int SumTrickyAndSmartUnsafe2Shift16()
 	{
-		long w = 0;
-		long x = 0;
+		int w = 0;
+		int x = 0;
 
 		var length = bills.Length;
 		fixed (int* ptr = bills)
@@ -209,7 +209,7 @@ public class IntegerSumCalculator
 	}
 
 	[Benchmark]
-	public long SumSimd()
+	public int SumSimd()
 	{
 		Vector<int> vectorSum = Vector<int>.Zero;
  
