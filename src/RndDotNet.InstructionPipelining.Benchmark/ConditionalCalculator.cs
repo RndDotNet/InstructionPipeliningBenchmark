@@ -1,11 +1,17 @@
 ﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
+using Perfolizer.Mathematics.Common;
 
 namespace RndDotNet.InstructionPipelining.Benchmark;
 
-[ShortRunJob(RuntimeMoniker.Net60, Jit.RyuJit, Platform.X64)]
-[LongRunJob(RuntimeMoniker.Net60, Jit.RyuJit, Platform.X64)]
+[MinColumn]
+[HardwareCounters(
+	HardwareCounter.BranchInstructionRetired, 
+	HardwareCounter.BranchMispredictions, 
+	HardwareCounter.BranchMispredictsRetired)]
+[VeryLongRunJob(RuntimeMoniker.Net60, Jit.RyuJit, Platform.X64)]
 public class ConditionalCalculator
 {
 	private const int billsCount = 10_000;

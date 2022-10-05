@@ -3,11 +3,14 @@ using System.Runtime.InteropServices;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
+using Microsoft.Diagnostics.Tracing.Parsers.MicrosoftWindowsTCPIP;
+using Perfolizer.Mathematics.Common;
 
 namespace RndDotNet.InstructionPipelining.Benchmark;
 
-[ShortRunJob(RuntimeMoniker.Net60, Jit.RyuJit, Platform.X64)]
-[LongRunJob(RuntimeMoniker.Net60, Jit.RyuJit, Platform.X64)]
+[MinColumn]
+[DisassemblyDiagnoser]
+[VeryLongRunJob(RuntimeMoniker.Net60, Jit.RyuJit, Platform.X64)]
 public class IntegerSumCalculator
 {
 	private const int billsCount = 10_000;
