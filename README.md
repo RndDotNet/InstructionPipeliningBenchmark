@@ -31,18 +31,19 @@ WarmupCount=30
 BenchmarkDotNet=v0.13.2, OS=Windows 10 (10.0.19044.1889/21H2/November2021Update)
 Intel Core i7-9750H CPU 2.60GHz, 1 CPU, 12 logical and 6 physical cores
 .NET SDK=7.0.100-preview.3.22179.4
-  [Host]                      : .NET 6.0.8 (6.0.822.36306), X64 RyuJIT AVX2
-  LongRun-.NET 6.0-RyuJit-X64 : .NET 6.0.8 (6.0.822.36306), X64 RyuJIT AVX2
+  [Host]                          : .NET 6.0.8 (6.0.822.36306), X64 RyuJIT AVX2
+  VeryLongRun-.NET 6.0-RyuJit-X64 : .NET 6.0.8 (6.0.822.36306), X64 RyuJIT AVX2
 
-Job=LongRun-.NET 6.0-RyuJit-X64  Jit=RyuJit  Platform=X64
-Runtime=.NET 6.0  IterationCount=100  LaunchCount=3
-WarmupCount=15
+Job=VeryLongRun-.NET 6.0-RyuJit-X64  Jit=RyuJit  Platform=X64
+Runtime=.NET 6.0  IterationCount=500  LaunchCount=4
+WarmupCount=30
 
-|                            Method |      Mean |     Error |   StdDev |     Median | Ratio | RatioSD |
-|---------------------------------- |----------:|----------:|---------:|-----------:|------:|--------:|
-|                     GetEvensCount | 99.595 us | 1.4385 us | 7.472 us | 101.784 us |  1.00 |    0.00 |
-|               GetEvensCountNative | 46.372 us | 0.7948 us | 4.128 us |  47.241 us |  0.47 |    0.05 |
-|        GetEvensCountOrderedNative |  9.528 us | 0.2603 us | 1.343 us |   9.031 us |  0.10 |    0.02 |
-| GetEvensCountPatternOrderedNative |  8.498 us | 0.2105 us | 1.097 us |   8.334 us |  0.09 |    0.01 |
-|           GetEvensCountNativeNoIf | 14.783 us | 0.3467 us | 1.807 us |  14.330 us |  0.15 |    0.02 |
-|    GetEvensCountOrderedNativeNoIf | 14.604 us | 0.3606 us | 1.808 us |  14.025 us |  0.15 |    0.02 |
+|                                Method |      Mean |     Error |    StdDev |    Median |       Min | Ratio | RatioSD | BranchInstructionRetired/Op | BranchMispredictions/Op | BranchMispredictsRetired/Op |
+|-------------------------------------- |----------:|----------:|----------:|----------:|----------:|------:|--------:|----------------------------:|------------------------:|----------------------------:|
+|                         GetEvensCount | 95.692 us | 0.6699 us | 9.0889 us | 97.651 us | 80.333 us |  9.08 |    1.23 |                     161,310 |                   5,003 |                       5,010 |
+|                   GetEvensCountNative | 36.139 us | 0.1389 us | 1.8107 us | 35.822 us | 31.073 us |  3.50 |    0.41 |                      30,746 |                   4,596 |                       4,602 |
+|            GetEvensCountOrderedNative |  8.088 us | 0.0596 us | 0.7856 us |  8.237 us |  6.927 us |  0.78 |    0.09 |                      30,089 |                       8 |                           8 |
+|     GetEvensCountPatternOrderedNative |  7.499 us | 0.0575 us | 0.7803 us |  7.704 us |  6.333 us |  0.71 |    0.09 |                           - |                       - |                           - |
+|               GetEvensCountNativeNoIf | 10.716 us | 0.1364 us | 1.8418 us |  9.956 us |  8.224 us |  1.00 |    0.00 |                      20,134 |                       5 |                           5 |
+|        GetEvensCountOrderedNativeNoIf | 10.591 us | 0.1436 us | 1.9481 us |  9.992 us |  8.332 us |  0.99 |    0.09 |                           - |                       - |                           - |
+| GetEvensCountNativeNoIfTrickyAndSmart |  5.566 us | 0.0234 us | 0.3167 us |  5.723 us |  4.895 us |  0.53 |    0.09 |                       2,554 |                       2 |                           2 |

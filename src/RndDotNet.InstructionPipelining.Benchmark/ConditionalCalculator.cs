@@ -2,7 +2,6 @@
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
-using Perfolizer.Mathematics.Common;
 
 namespace RndDotNet.InstructionPipelining.Benchmark;
 
@@ -30,7 +29,7 @@ public class ConditionalCalculator
 		
 	}
 	
-	[Benchmark(Baseline = true)]
+	[Benchmark]
 	public int GetEvensCount()
 	{
 		return bills.Count(t => t % 2 == 0);
@@ -69,7 +68,7 @@ public class ConditionalCalculator
 		return evens;
 	}
 
-	[Benchmark]
+	[Benchmark(Baseline = true)]
 	public int GetEvensCountNativeNoIf()
 	{
 		var evens = 0;
@@ -87,5 +86,33 @@ public class ConditionalCalculator
 			evens += 1 ^ (bills[i] % 2);
 
 		return evens;
+	}
+	
+	[Benchmark]
+	public unsafe int GetEvensCountNativeNoIfTrickyAndSmart()
+	{
+		var evens = 0;
+		var events2 = 0;
+		var events3 = 0;
+		var events4 = 0;
+		
+		var length = bills.Length;
+		fixed (int* ptr = bills)
+		{
+			var pointer = ptr;
+			var bound = pointer + length;
+			while (pointer != bound)
+			{
+				evens += 1 ^ (*pointer % 2);
+				events2 += 1 ^ (*(pointer + 1) % 2);
+				events3 += 1 ^ (*(pointer + 2) % 2);
+				events4 += 1 ^ (*(pointer + 3) % 2);
+				pointer += 4;
+			}
+		}
+ 
+		evens += events2;
+		events3 += events4;
+		return evens + events3;
 	}
 }
