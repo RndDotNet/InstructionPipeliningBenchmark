@@ -13,80 +13,45 @@ namespace RndDotNet.InstructionPipelining.Benchmark;
 [VeryLongRunJob(RuntimeMoniker.Net60, Jit.RyuJit, Platform.X64)]
 public class ConditionalCalculator
 {
-	private const int billsCount = 10_000;
+	private const int bidsCount = 10_000;
 	private const int maxCost = 1000;
-	private int[] bills;
-	private int[] orderedBills;
-	private int[] patternOrderedBills;
+	private int[] bids;
+	private int[] orderedBids;
+	private int[] patternOrderedBids;
 
 	[GlobalSetup]
 	public void GlobalSetup()
 	{
 		var rnd = new Random(61);
-		patternOrderedBills = Enumerable.Range(0, billsCount).Select(i => rnd.Next(0, maxCost, i % 2 == 0)).ToArray();
-		bills = patternOrderedBills.OrderBy(x => Guid.NewGuid()).ToArray();
-		orderedBills = bills.OrderBy(s => s % 2 == 0).ToArray();
+		patternOrderedBids = Enumerable.Range(0, bidsCount).Select(i => rnd.Next(0, maxCost, i % 2 == 0)).ToArray();
+		bids = patternOrderedBids.OrderBy(x => Guid.NewGuid()).ToArray();
+		orderedBids = bids.OrderBy(s => s % 2 == 0).ToArray();
 		
 	}
 	
 	[Benchmark]
-	public int GetEvensCount()
-	{
-		return bills.Count(t => t % 2 == 0);
-	}
-	
+	public int GetEvensCount() 
+		=> bids.Count(t => t % 2 == 0);
+
 	[Benchmark]
-	public int GetEvensCountNative()
-	{
-		var evens = 0;
-		for (var i = 0; i < bills.Length; i++)
-			if (bills[i] % 2 == 0)
-				evens++;
- 
-		return evens;
-	}
-	
+	public int GetEvensCountNative() 
+		=> GetEvensCountNativeInternal(bids);
+
 	[Benchmark]
 	public int GetEvensCountOrderedNative()
-	{
-		var evens = 0;
-		for (var i = 0; i < orderedBills.Length; i++)
-			if (orderedBills[i] % 2 == 0)
-				evens++;
- 
-		return evens;
-	}
+		=> GetEvensCountNativeInternal(orderedBids);
 	
 	[Benchmark]
 	public int GetEvensCountPatternOrderedNative()
-	{
-		var evens = 0;
-		for (var i = 0; i < patternOrderedBills.Length; i++)
-			if (patternOrderedBills[i] % 2 == 0)
-				evens++;
- 
-		return evens;
-	}
+		=> GetEvensCountNativeInternal(patternOrderedBids);
 
 	[Benchmark(Baseline = true)]
-	public int GetEvensCountNativeNoIf()
-	{
-		var evens = 0;
-		for (var i = 0; i < bills.Length; i++)
-			evens += 1 ^ (bills[i] % 2);
+	public int GetEvensCountNativeNoIf() 
+		=> GetEvensCountNativeNoIfInternal(bids);
 
-		return evens;
-	}
-	
 	[Benchmark]
 	public int GetEvensCountOrderedNativeNoIf()
-	{
-		var evens = 0;
-		for (var i = 0; i < bills.Length; i++)
-			evens += 1 ^ (bills[i] % 2);
-
-		return evens;
-	}
+		=> GetEvensCountNativeNoIfInternal(orderedBids);
 	
 	[Benchmark]
 	public unsafe int GetEvensCountNativeNoIfTrickyAndSmart()
@@ -96,8 +61,8 @@ public class ConditionalCalculator
 		var events3 = 0;
 		var events4 = 0;
 		
-		var length = bills.Length;
-		fixed (int* ptr = bills)
+		var length = bids.Length;
+		fixed (int* ptr = bids)
 		{
 			var pointer = ptr;
 			var bound = pointer + length;
@@ -114,5 +79,26 @@ public class ConditionalCalculator
 		evens += events2;
 		events3 += events4;
 		return evens + events3;
+	}
+	
+	private int GetEvensCountNativeInternal(int[] source)
+	{
+
+		int evens = 0;
+		for (var i = 0; i < source.Length; i++)
+			if (source[i] % 2 == 0)
+				evens++;
+
+		return evens;
+	}
+
+	private int GetEvensCountNativeNoIfInternal(int[] source)
+	{
+
+		var evens = 0;
+		for (var i = 0; i < source.Length; i++)
+			evens += 1 ^ (source[i] % 2);
+
+		return evens;
 	}
 }

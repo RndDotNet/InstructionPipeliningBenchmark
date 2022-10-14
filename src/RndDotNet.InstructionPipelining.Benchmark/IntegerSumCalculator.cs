@@ -13,31 +13,31 @@ namespace RndDotNet.InstructionPipelining.Benchmark;
 [VeryLongRunJob(RuntimeMoniker.Net60, Jit.RyuJit, Platform.X64)]
 public class IntegerSumCalculator
 {
-	private const int billsCount = 10_000;
+	private const int bidsCount = 10_000;
 	private const int maxCost = 1000;
-	private int[] bills;
+	private int[] bids;
 
 	[GlobalSetup]
 	public void GlobalSetup()
 	{
 		var rnd = new Random(61);
-		bills = Enumerable.Range(0, billsCount).Select(i => rnd.Next(0, maxCost)).ToArray();
+		bids = Enumerable.Range(0, bidsCount).Select(i => rnd.Next(0, maxCost)).ToArray();
 	}
 	
 	[Benchmark]
 	public int EnumerableSum()
 	{
-		return bills.Sum();
+		return bids.Sum();
 	}
 	
 	[Benchmark]
 	public int SumNaive()
 	{
 		int result = 0;
-		var bound = bills.Length;
+		var bound = bids.Length;
 		for (int i = 0; i < bound; i++)
 		{
-			result += bills[i];
+			result += bids[i];
 		}
  
 		return result;
@@ -47,8 +47,8 @@ public class IntegerSumCalculator
 	public unsafe int SumNaiveUnsafe()
 	{
 		int result = 0;
-		var length = bills.Length;
-		fixed (int* ptr = bills)
+		var length = bids.Length;
+		fixed (int* ptr = bids)
 		{
 			var pointer = ptr;
 			var bound = pointer + length;
@@ -67,8 +67,8 @@ public class IntegerSumCalculator
 	{
 		int x = 0;
  
-		var length = bills.Length;
-		fixed (int* ptr = bills)
+		var length = bids.Length;
+		fixed (int* ptr = bids)
 		{
 			var pointer = ptr;
 			var bound = pointer + length;
@@ -93,8 +93,8 @@ public class IntegerSumCalculator
 		int y = 0;
 		int z = 0;
  
-		var length = bills.Length;
-		fixed (int* ptr = bills)
+		var length = bids.Length;
+		fixed (int* ptr = bids)
 		{
 			var pointer = ptr;
 			var bound = pointer + length;
@@ -119,8 +119,8 @@ public class IntegerSumCalculator
 		int w = 0;
 		int x = 0;
 
-		var length = bills.Length;
-		fixed (int* ptr = bills)
+		var length = bids.Length;
+		fixed (int* ptr = bids)
 		{
 			var pointer = ptr;
 			var bound = pointer + length;
@@ -147,8 +147,8 @@ public class IntegerSumCalculator
 		int y2 = 0;
 		int z2 = 0;
  
-		var length = bills.Length;
-		fixed (int* ptr = bills)
+		var length = bids.Length;
+		fixed (int* ptr = bids)
 		{
 			var pointer = ptr;
 			var bound = pointer + length;
@@ -181,8 +181,8 @@ public class IntegerSumCalculator
 		int w = 0;
 		int x = 0;
 
-		var length = bills.Length;
-		fixed (int* ptr = bills)
+		var length = bids.Length;
+		fixed (int* ptr = bids)
 		{
 			var pointer = ptr;
 			var bound = pointer + length;
@@ -216,7 +216,7 @@ public class IntegerSumCalculator
 	{
 		Vector<int> vectorSum = Vector<int>.Zero;
  
-		Span<Vector<int>> vectorsArray = MemoryMarshal.Cast<int, Vector<int>>(bills);
+		Span<Vector<int>> vectorsArray = MemoryMarshal.Cast<int, Vector<int>>(bids);
  
 		for (var i = 0; i < vectorsArray.Length; i++)
 		{
